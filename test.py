@@ -39,5 +39,10 @@ img = Image.open(filename)
 w, h = img.size
 print("Dimensons: ", img.size, "Total pixels: ", w * h)
 
+f = os.path.join('assets/asteroid.png')
+i = Image.open(f)
+w2, h2 = img.size
+print("Dimensions: ", img.size, "Total pixels: ",  w2 * h2 )
+
 
 pg.quit()
