@@ -3,4 +3,3 @@ UNIT_X = 32
 UNIT_Y = 64
 WIN_TITLE = "GAME"
 
-
