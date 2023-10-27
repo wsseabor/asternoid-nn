@@ -13,7 +13,7 @@ class State():
     def __init__(self):
         self.worldSize = pg.math.Vector2(16, 10)
         self.playerPos = pg.math.Vector2(8, 8)
-        self.asteroidPos = []
+        self.asteroidPos = pg.math.Vector2(2, 2)
 
     def update(self, moveCommand):
         self.playerPos += moveCommand
@@ -31,10 +31,14 @@ class State():
     def populate(self):
         maxOnScreen = 6
 
-        while len(self.asteroidPos) <= maxOnScreen:
-            self.asteroidPos.append(pg.math.Vector2(random.randint(0, 16), random.randint(0, 16)))
-            for i in range(len(self.asteroidPos)):
-                print(self.asteroidPos[i])
+    def updateAsteroids(self, moveCommand):
+        self.asteroidPos += moveCommand
+
+        #Asteroids can go off screen at the bottom
+        if self.asteroidPos.y < 0:
+            self.asteroidPos.y = 0
+        elif self.asteroidPos.y >= self.worldSize.x:
+            self.asteroidPos.y = self.worldSize.y - 1
 
 
 
@@ -51,16 +55,28 @@ class Game():
         #Calculate size of world and unit texture in img file, set window
         self.cellSize = pg.math.Vector2(UNIT_X, UNIT_Y)
         self.unitTexture = pg.image.load('assets/body_01.png')
-        self.winTexture = pg.image.load("assets/stars_texture.png")
+        self.winTexture = pg.image.load('assets/stars_texture.png')
+        self.astTexture = pg.image.load('assets/asteroid.png')
 
         windowSize = self.state.worldSize.elementwise() * self.cellSize
         self.window = pg.display.set_mode((int(windowSize.x), int(windowSize.y)))
         pg.display.set_caption(WIN_TITLE)
         self.moveCommand = pg.math.Vector2(0, 0)
+        self.astCommand = pg.math.Vector2(0, 0)
 
         #Looping
         self.clock = pg.time.Clock()
         self.running = True
+
+    def asteroidMovement(self):
+        self.astCommand = pg.math.Vector2(0, 0)
+
+        for e in pg.event.get():
+            if e.type == pg.QUIT:
+                self.running = False
+                break
+            else:
+                self.astCommand.y += 1
 
 
     def processInput(self):
@@ -88,16 +104,21 @@ class Game():
     #Update movement
     def update(self):
         self.state.update(self.moveCommand)
+        self.state.updateAsteroids(self.astCommand)
 
-    #Render img and background to window
+    #Render images and background to window
     def render(self):
         self.window.fill((0, 0, 0))
         
+        #Render the sprites
         spritePoint = self.state.playerPos.elementwise() * self.cellSize
+        astSprite = self.state.asteroidPos.elementwise() * self.cellSize
         texturePoint = pg.math.Vector2(0, 0).elementwise() * self.cellSize
         textureRect = pg.Rect(int(texturePoint.x), int(texturePoint.y), int(self.cellSize.x), int(self.cellSize.y))
         self.window.blit(self.winTexture, self.winTexture.get_rect(center = self.window.get_rect().center))
         self.window.blit(self.unitTexture, spritePoint, textureRect)
+        self.window.blit(self.astTexture, astSprite, textureRect)
+        
 
         self.state.populate()
         

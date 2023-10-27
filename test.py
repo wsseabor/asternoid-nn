@@ -16,7 +16,7 @@ H = 600
 
 pg.init()
 bg = pg.image.load("assets/stars_texture.png")
-obj = pg.image.load("assets/asteroid.png")
+ast = pg.image.load("assets/asteroid.png")
 win = pg.display.set_mode((W, H))
 location = pg.math.Vector2(96, 96)
 rect = pg.Rect(0, 64, 32, 64)
@@ -28,8 +28,8 @@ while True:
         break
     win.fill((0, 0, 0))
     win.blit(bg, bg.get_rect(center = win.get_rect().center))
-    win.blit(obj, obj.get_rect(center = win.get_rect().center))
-    pg.display.flip()
+    win.blit(ast, ast.get_rect(center = win.get_rect().center))
+    pg.display.update()
 
 pg.quit()
 
@@ -41,8 +41,15 @@ print("Dimensons: ", img.size, "Total pixels: ", w * h)
 
 f = os.path.join('assets/asteroid.png')
 i = Image.open(f)
-w2, h2 = img.size
-print("Dimensions: ", img.size, "Total pixels: ",  w2 * h2 )
+w, h = img.size
+left = 5
+top = h / 4
+right = 164
+bottom = 3 * h / 4
+i = i.crop()
+
+print("Dimensions: ", img.size, "Total pixels: ",  w * h )
 
 
 pg.quit()
+
