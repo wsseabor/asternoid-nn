@@ -14,6 +14,7 @@ class State():
         self.worldSize = pg.math.Vector2(16, 10)
         self.playerPos = pg.math.Vector2(8, 8)
         self.asteroidPos = pg.math.Vector2(2, 2)
+        self.asteroidPos2 = pg.math.Vector2(4, 4)
 
     def update(self, moveCommand):
         self.playerPos += moveCommand
@@ -37,6 +38,7 @@ class State():
     #Same logic for player update without boundary logic for the y dimension
     def updateAsteroids(self, moveCommand):
         self.asteroidPos += moveCommand
+        self.asteroidPos2 += moveCommand
 
         #Asteroids can go off screen at the bottom
         if self.asteroidPos.x < 0:
@@ -114,11 +116,13 @@ class Game():
         #Render the sprites
         spritePoint = self.state.playerPos.elementwise() * self.cellSize
         astSprite = self.state.asteroidPos.elementwise() * self.cellSize
+        astSprite2 = self.state.asteroidPos2.elementwise() * self.cellSize
         texturePoint = pg.math.Vector2(0, 0).elementwise() * self.cellSize
         textureRect = pg.Rect(int(texturePoint.x), int(texturePoint.y), int(self.cellSize.x), int(self.cellSize.y))
         self.window.blit(self.winTexture, self.winTexture.get_rect(center = self.window.get_rect().center))
         self.window.blit(self.unitTexture, spritePoint, textureRect)
         self.window.blit(self.astTexture, astSprite, textureRect)
+        self.window.blit(self.astTexture, astSprite2, textureRect)
         
 
         #self.state.populate()
