@@ -28,17 +28,21 @@ class State():
         elif self.playerPos.y >= self.worldSize.y:
             self.playerPos.y = self.worldSize.y - 1
 
+    #List for asteroid sprites, positions, max on screen, etc, TODO
+    """
     def populate(self):
         maxOnScreen = 6
+    """
 
+    #Same logic for player update without boundary logic for the y dimension
     def updateAsteroids(self, moveCommand):
         self.asteroidPos += moveCommand
 
         #Asteroids can go off screen at the bottom
-        if self.asteroidPos.y < 0:
-            self.asteroidPos.y = 0
-        elif self.asteroidPos.y >= self.worldSize.x:
-            self.asteroidPos.y = self.worldSize.y - 1
+        if self.asteroidPos.x < 0:
+            self.asteroidPos.x = 0
+        elif self.asteroidPos.x >= self.worldSize.x:
+            self.asteroidPos.x = self.worldSize.x - 1
 
 
 
@@ -58,6 +62,7 @@ class Game():
         self.winTexture = pg.image.load('assets/stars_texture.png')
         self.astTexture = pg.image.load('assets/asteroid.png')
 
+        #Blit to screen
         windowSize = self.state.worldSize.elementwise() * self.cellSize
         self.window = pg.display.set_mode((int(windowSize.x), int(windowSize.y)))
         pg.display.set_caption(WIN_TITLE)
@@ -67,17 +72,6 @@ class Game():
         #Looping
         self.clock = pg.time.Clock()
         self.running = True
-
-    def asteroidMovement(self):
-        self.astCommand = pg.math.Vector2(0, 0)
-
-        for e in pg.event.get():
-            if e.type == pg.QUIT:
-                self.running = False
-                break
-            else:
-                self.astCommand.y += 1
-
 
     def processInput(self):
         #Init as Vec2
@@ -100,11 +94,18 @@ class Game():
                     self.moveCommand.y = 1
                 elif e.key == pg.K_UP:
                     self.moveCommand.y = -1
+
+    #Define some random asteroid movement
+    def asteroidMovement(self, astCommand):
+        self.astCommand = pg.math.Vector2(0, 0)
+
+        self.astCommand.y += 0.1
     
     #Update movement
     def update(self):
         self.state.update(self.moveCommand)
         self.state.updateAsteroids(self.astCommand)
+        self.asteroidMovement(self.astCommand)
 
     #Render images and background to window
     def render(self):
@@ -120,7 +121,7 @@ class Game():
         self.window.blit(self.astTexture, astSprite, textureRect)
         
 
-        self.state.populate()
+        #self.state.populate()
         
         pg.display.update()
 
