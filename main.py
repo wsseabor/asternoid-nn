@@ -36,12 +36,24 @@ class Asteroid(pg.sprite.Sprite):
     def update(self):
         pass
 
+class GameState():
+    def __init__(self):
+        self.units = [
+            Player(self, (0, 0))
+        ]
+
+    def update(self, moveCommand):
+        pass
+
+
+
 class Game():
     def __init__(self):
         self.size = [SCREEN_X, SCREEN_Y]
         self.window = pg.display.set_mode(self.size)
         self.running = True
         self.clock = pg.time.Clock()
+        self.gameState = GameState
 
         pg.init()
 
@@ -60,9 +72,11 @@ class Game():
 
     def render(self):
         #Background
-
         self.window.fill((0, 0, 0))
         self.window.blit(bgTexture, bgTexture.get_rect(center = self.window.get_rect().center))
+
+        for unit in self.gameState.units:
+            pass
 
         pg.display.update()
 
