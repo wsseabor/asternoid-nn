@@ -1,6 +1,11 @@
-FPS = 60
-UNIT_X = 32
-UNIT_Y = 64
-WIN_TITLE = "GAME"
+import pygame as pg
 
+FPS = 60
+SCREEN_X = 800
+SCREEN_Y = 600
+WIN_TITLE = "Asteroid Dodge"
+
+playerTexture = pg.image.load('assets/body_01.png')
+bgTexture = pg.image.load('assets/stars_texture.png')
+asteroidTexture = pg.image.load('assets/asteroid.png')
 
