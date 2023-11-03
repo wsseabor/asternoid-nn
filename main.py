@@ -5,57 +5,98 @@ import os
 from constants import *
 import random
 import time
+from settings import Settings
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
+class Stats():
+    def __init__(self, game):
+        self.settings = Settings()
+        self.resetStats()
+
+        self.gameActive= False
+
+        self.highScore = 0
+
+    def resetStats(self):
+        self.score = 0
+        
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, position):
+    def __init__(self, game):
         super().__init__()
-        self.image = playerTexture
-        self.rect = self.image.get_rect(center = position)
-        self.x = 0
-        self.y = 0
+        self.screen = game.screen
+        self.settings = game.settings
+        self.screenRect = game.screen.get_rect()
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        self.image = pg.image.load(playerTexture)
+        self.rect = self.image.get_rect()
+
+        self.rect.midbottom = self.screenRect.midbottom
+
+        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
+
+        self.moveRight = False
+        self.moveLeft = False
+        self.moveUp = False
+        self.moveDown = False
+
+    def draw(self):
+        self.screen.blit(self.image, self.rect)
+
+    def center(self):
+        self.rect.midbottom = self.screenRect.midbottom
+        self.x = float(self.rect.x)
 
     def update(self):
-        pass
+        if self.moveRight and self.rect.right < self.screenRect.right:
+            self.x += self.settings.speed
+        if self.moveLeft and self.rect.left > self.screenRect.left:
+            self.x -= self.settings.speed
+        if self.moveUp and self.rect.top > 0:
+            self.y -= self.settings.shipSpeed
+        if self.moveDown and self.rect.bottom < self.screenRect.bottom:
+            self.y += self.settings.shipSpeed
+        
+        self.rect.x = self.x
+        self.rect.y = self.y
 
 class Asteroid(pg.sprite.Sprite):
-    def __init__(self, position):
+    def __init__(self, game):
         super().__init__()
-        self.image = asteroidTexture
-        self.rect = self.image.get_rect(center = position)
-        self.y = 0
+        self.screen = game.screen
+        self.settings = game.settings
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+        self.image = pg.image.load(asteroidTexture)
+        self.rect = self.image.get_rect()
+
+        self.rect.x = self.rect.width
+        self.rect.y = self.rect.y
+
+        self.x = float(self.rect.x)
+        
+
+    def draw(self):
+        self.screen.blit(self.image, self.rect)
 
     def update(self):
-        pass
-
-class GameState():
-    def __init__(self):
-        self.units = [
-            Player(self, (0, 0))
-        ]
-
-    def update(self, moveCommand):
-        pass
-
-
+        self.y -= (self.settings.astSpeed)
+        self.rect.y = self.y
 
 class Game():
     def __init__(self):
-        self.size = [SCREEN_X, SCREEN_Y]
-        self.window = pg.display.set_mode(self.size)
-        self.running = True
-        self.clock = pg.time.Clock()
-        self.gameState = GameState
 
         pg.init()
+        self.settings = Settings()
+
+        self.screen = pg.display.set_mode(SCREEN_X, SCREEN_Y)
+        self.settings.screenWidth = self.screen.get_rect().widths
+        self.settings.screenHeight = self.screen.get_rect().height
+
+        pg.display.get_caption(WIN_TITLE)
+
+
 
     def processInput(self):
 
@@ -86,9 +127,9 @@ class Game():
             self.render()
             self.clock.tick(FPS)
 
+
 game = Game()
 game.run()
-
 pg.quit()
 
     
