@@ -10,7 +10,7 @@ from settings import Settings
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 class Stats():
-    def __init__(self, game):
+    def __init__(self, settings):
         self.settings = Settings()
         self.resetStats()
 
@@ -20,17 +20,18 @@ class Stats():
 
     def resetStats(self):
         self.score = 0
+        self.highScore = self.highScore
         
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game):
-        super().__init__()
-        self.screen = game.screen
-        self.settings = game.settings
-        self.screenRect = game.screen.get_rect()
+    def __init__(self, settings, screen):
+        super(Player, self).__init__()
+        self.screen = screen
+        self.settings = settings
 
         self.image = pg.image.load(playerTexture)
         self.rect = self.image.get_rect()
+        self.screenRect = self.get_rect()
 
         self.rect.midbottom = self.screenRect.midbottom
 
@@ -63,16 +64,16 @@ class Player(pg.sprite.Sprite):
         self.rect.y = self.y
 
 class Asteroid(pg.sprite.Sprite):
-    def __init__(self, game):
-        super().__init__()
-        self.screen = game.screen
-        self.settings = game.settings
+    def __init__(self, settings, screen):
+        super(Asteroid, self).__init__()
+        self.screen = screen
+        self.settings = settings
 
         self.image = pg.image.load(asteroidTexture)
         self.rect = self.image.get_rect()
 
         self.rect.x = self.rect.width
-        self.rect.y = self.rect.y
+        self.rect.y = self.rect.height
 
         self.x = float(self.rect.x)
         
@@ -90,11 +91,17 @@ class Game():
         pg.init()
         self.settings = Settings()
 
-        self.screen = pg.display.set_mode(SCREEN_X, SCREEN_Y)
-        self.settings.screenWidth = self.screen.get_rect().widths
+        self.screen = pg.display.set_mode((SCREEN_X, SCREEN_Y))
+        self.settings.screenWidth = self.screen.get_rect().width
         self.settings.screenHeight = self.screen.get_rect().height
 
-        pg.display.get_caption(WIN_TITLE)
+        pg.display.set_caption(WIN_TITLE)
+
+        self.stats = Stats()
+        self.player = Player(self)
+        self.asteroids = pg.sprite.Group()
+
+
 
 
 
