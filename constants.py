@@ -6,6 +6,7 @@ SCREEN_Y = 600
 WIN_TITLE = "Asteroid Dodge"
 MAX_AST = 6
 BG_COLOR = (0, 0, 0)
+TEXT_COLOR = (50, 50, 50)
 
 playerTexture = pg.image.load('assets/body_01.png')
 bgTexture = pg.image.load('assets/stars_texture.png')

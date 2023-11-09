@@ -9,82 +9,6 @@ from settings import Settings
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-class Stats():
-    def __init__(self, settings):
-        self.settings = Settings()
-        self.resetStats()
-
-        self.gameActive= False
-
-        self.highScore = 0
-
-    def resetStats(self):
-        self.score = 0
-        self.highScore = self.highScore
-        
-
-class Player(pg.sprite.Sprite):
-    def __init__(self, settings, screen):
-        super(Player, self).__init__()
-        self.screen = screen
-        self.settings = settings
-
-        self.image = pg.image.load(playerTexture)
-        self.rect = self.image.get_rect()
-        self.screenRect = self.get_rect()
-
-        self.rect.midbottom = self.screenRect.midbottom
-
-        self.x = float(self.rect.x)
-        self.y = float(self.rect.y)
-
-        self.moveRight = False
-        self.moveLeft = False
-        self.moveUp = False
-        self.moveDown = False
-
-    def draw(self):
-        self.screen.blit(self.image, self.rect)
-
-    def center(self):
-        self.rect.midbottom = self.screenRect.midbottom
-        self.x = float(self.rect.x)
-
-    def update(self):
-        if self.moveRight and self.rect.right < self.screenRect.right:
-            self.x += self.settings.speed
-        if self.moveLeft and self.rect.left > self.screenRect.left:
-            self.x -= self.settings.speed
-        if self.moveUp and self.rect.top > 0:
-            self.y -= self.settings.shipSpeed
-        if self.moveDown and self.rect.bottom < self.screenRect.bottom:
-            self.y += self.settings.shipSpeed
-        
-        self.rect.x = self.x
-        self.rect.y = self.y
-
-class Asteroid(pg.sprite.Sprite):
-    def __init__(self, settings, screen):
-        super(Asteroid, self).__init__()
-        self.screen = screen
-        self.settings = settings
-
-        self.image = pg.image.load(asteroidTexture)
-        self.rect = self.image.get_rect()
-
-        self.rect.x = self.rect.width
-        self.rect.y = self.rect.height
-
-        self.x = float(self.rect.x)
-        
-
-    def draw(self):
-        self.screen.blit(self.image, self.rect)
-
-    def update(self):
-        self.y -= (self.settings.astSpeed)
-        self.rect.y = self.y
-
 class Game():
     def __init__(self):
 
@@ -101,22 +25,6 @@ class Game():
         self.player = Player(self)
         self.asteroids = pg.sprite.Group()
 
-
-
-
-
-    def processInput(self):
-
-        for e in pg.event.get():
-            if e.type == pg.QUIT:
-                self.running = False
-                break
-            elif e.type == pg.KEYDOWN:
-                if e.key == pg.K_ESCAPE:
-                    self.running = False
-                    break
-                elif e.key == pg.K_RIGHT:
-                    pass
 
     def render(self):
         #Background
