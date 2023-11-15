@@ -14,7 +14,7 @@ class Scoreboard:
         self.textColor = (TEXT_COLOR)
         self.font = pg.font.SysFont(None, 48)
 
-        self.prep()
+        self.prepScore()
         self.prepHighScore()
         
     def prepScore(self):

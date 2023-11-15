@@ -3,14 +3,14 @@ from constants import *
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, settings, screen):
-        super(Player, self).__init__()
-        self.screen = screen
-        self.settings = settings
+    def __init__(self, game):
+        super().__init__()
+        self.screen = game.screen
+        self.settings = game.settings
+        self.screenRect = game.screen.get_rect()
 
         self.image = pg.image.load(playerTexture)
         self.rect = self.image.get_rect()
-        self.screenRect = self.get_rect()
 
         self.rect.midbottom = self.screenRect.midbottom
 

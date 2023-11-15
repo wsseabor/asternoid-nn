@@ -9,4 +9,4 @@ class Stats():
 
     def resetStats(self):
         self.score = 0
-        self.highScore = self.highScore
+        self.highScore = self.score

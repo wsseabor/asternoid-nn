@@ -1,201 +1,118 @@
 #/usr/bin/env/python3
 
 import pygame as pg
+from pygame.sprite import Group
 import os
+import sys
 from constants import *
-import random
-import time
+from stats import Stats
+from player import Player
+from asteroid import Asteroid
 from settings import Settings
+from buttons import Button
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-class Game():
+class Game:
     def __init__(self):
-
         pg.init()
+        self.clock = pg.time.Clock()
         self.settings = Settings()
 
-        self.screen = pg.display.set_mode((SCREEN_X, SCREEN_Y))
-        self.settings.screenWidth = self.screen.get_rect().width
-        self.settings.screenHeight = self.screen.get_rect().height
-
+        self.screen = pg.display.set_mode(
+            (self.settings.screenWidth, self.settings.screenHeight)
+        )
         pg.display.set_caption(WIN_TITLE)
 
-        self.stats = Stats()
+        self.stats = Stats(self)
+
         self.player = Player(self)
         self.asteroids = pg.sprite.Group()
 
-
-    def render(self):
-        #Background
-        self.window.fill((0, 0, 0))
-        self.window.blit(bgTexture, bgTexture.get_rect(center = self.window.get_rect().center))
-
-        for unit in self.gameState.units:
-            pass
-
-        pg.display.update()
+        self.playBtn = Button(self, PLAY_TITLE)
 
     def run(self):
-        while self.running:
-            self.processInput()
-            self.render()
+        while True:
+            self._checkAllEvents()
+
+            if self.gameActive:
+                self.player.update()
+                
+            self._update()
             self.clock.tick(FPS)
 
+    def _checkPlay(self, mousePos):
+        buttonClicked = self.playBtn.rect.collidepoint(mousePos)
 
-game = Game()
-game.run()
-pg.quit()
+        if buttonClicked and not self.gameActive:
+            self.stats.resetStats()
+            self.gameActive = True
 
-    
+            self.asteroids.empty()
+            self.player.center()
 
-#OLD
-"""
-#Unit superclass
-class Unit():
-    def __init__(self, state, position, tile):
-        self.state = state
-        self.position = position
-        self.tile = tile
+            pg.mouse.set_visible(False)
+                
+    def _checkDownEvents(self):
+        for event in pg.event.get():
+            if event.key == pg.K_RIGHT:
+                    self.player.moveRight = True
+            elif event.key == pg.K_LEFT:
+                self.player.moveLeft = True
+            elif event.key == pg.K_UP:
+                self.player.moveUp == True
+            elif event.key == pg.K_DOWN:
+                self.player.moveDown == True
+            elif event.key == pg.K_q:
+                sys.exit()
 
-    def move(self, vector):
-        raise NotImplementedError()
+    def _checkUpEvents(self, event):
+        if event.key == pg.K_RIGHT:
+            self.player.moveRight == False
+        elif event.key == pg.K_LEFT:
+            self.player.moveLeft == False
+        elif event.key == pg.K_UP:
+            self.player.moveUp == False
+        elif event.key == pg.K_DOWN:
+            self.player.moveDown == False
 
-#Player class based on unit superclass
-class Player(Unit):
-    def move(self, vector):
-        newPlayerPos = self.position + vector
+    def _createAsteroids(self):
+        asteroids = Asteroid(self)
+        astWidth, astHeight = asteroids.rect.size
 
-        if newPlayerPos.x < 0 or newPlayerPos.x >= self.state.worldSize.x \
-        or newPlayerPos.y < 0 or newPlayerPos.y >= self.state.worldSize.y:
-            return
-        
-        for unit in self.state.units:
-            if newPlayerPos == unit.position:
-                return
-            
-        self.position = newPlayerPos
+        currentX, currentY = astWidth, astHeight
 
-#Enemy class based on unit superclass
-class Asteroid(Unit):
-    def move(self, vector):
-        newAstPos = self.position + vector
 
-        if newAstPos.x < 0 or newAstPos.x >= self.state.worldSize.x:
-            return
-        
-        for unit in self.state.units:
-            if newAstPos == unit.position:
-                return
-            
-        self.position = newAstPos
-            
+    def _createAsteroid(self, xPos, yPos):
+        newAst = Asteroid(self)
+        newAst.x = xPos
+        newAst.rect.x = xPos
+        newAst.rect.y = yPos
+        self.asteroids.add(newAst)
 
-#Game state class, tracks movement and position
-class State():
-    def __init__(self):
-        self.worldSize = pg.math.Vector2(16, 10)
-        self.units = [
-            Player(self, pg.math.Vector2(8, 8), pg.math.Vector2(1, 0)),
-            Asteroid(self, pg.math.Vector2(10, 8), pg.math.Vector2(0, 2))
-        ]
-
-    def updatePlayer(self, movePlayerCommand):
-        for unit in self.units:
-            unit.move(movePlayerCommand)
-        
-    def populate(self):
-        maxOnScreen = 6
-
-#Game class, primary event queue and loop
-class Game():
-    def __init__(self):
-
-        #Required to run
-        pg.init()
-
-        #Init instance of game state
-        self.state = State()
-
-        #Calculate size of world and unit texture in img file, set window
-        self.cellSize = pg.math.Vector2(UNIT_X, UNIT_Y)
-        self.unitTexture = pg.image.load('assets/body_01.png')
-        self.winTexture = pg.image.load('assets/stars_texture.png')
-        self.astTexture = pg.image.load('assets/asteroid.png')
-
-        #Set display and vectors
-        windowSize = self.state.worldSize.elementwise() * self.cellSize
-        self.window = pg.display.set_mode((int(windowSize.x), int(windowSize.y)))
-        pg.display.set_caption(WIN_TITLE)
-        self.moveCommand = pg.math.Vector2(0, 0)
-        self.astCommand = pg.math.Vector2(0, 0)
-
-        #Looping
-        self.clock = pg.time.Clock()
-        self.running = True
-
-    def processInput(self):
-        #Init as Vec2
-        self.movePlayerCommand = pg.math.Vector2(0, 0)
-
-        #Event loop processing for movement input, using Vec2 in moveCommand tuple (x, y)
+    def _checkAllEvents(self):
         for e in pg.event.get():
             if e.type == pg.QUIT:
-                self.running = False
-                break
+                sys.exit()
             elif e.type == pg.KEYDOWN:
-                if e.key == pg.K_ESCAPE:
-                    self.running = False
-                    break
-                elif e.key == pg.K_RIGHT:
-                    self.moveCommand.x = 1
-                elif e.key == pg.K_LEFT:
-                    self.moveCommand.x = -1
-                elif e.key == pg.K_DOWN:
-                    self.moveCommand.y = 1
-                elif e.key == pg.K_UP:
-                    self.moveCommand.y = -1
+                self._checkDownEvents(e)
+            elif e.type == pg.KEYUP:
+                self._checkUpEvents(e)
+            elif e.type == pg.MOUSEBUTTONDOWN:
+                mousePos = pg.mouse.get_pos()
+                self._checkPlay(mousePos)
 
-    #Define some random asteroid movement
-    def asteroidMovement(self, astCommand):
-        astCommand = pg.math.Vector2(0, 0)
+    def _update(self):
+        self.screen.fill(self.settings.bgColor)
 
-        astCommand.y += 0.1
-    
-    #Update movement
-    def update(self):
-        self.state.updatePlayer(self.movePlayerCommand)
+        self.player.draw()
+        self.asteroids.draw(self.screen)
 
-    #Render images and background to window
-    def renderUnit(self, unit):
-        spritePoint = unit.position.elementwise() * self.cellSize
-        texturePoint = unit.tile.elementwise() * self.cellSize
-        textureRect = pg.Rect(int(texturePoint.x), int(texturePoint.y), int(self.cellSize.x), int(self.cellSize.y))
-        self.window.blit(self.unitTexture, spritePoint, textureRect)
-        self.window.blit(self.astTexture, spritePoint, textureRect)
+        if not self.gameActive:
+            self.playBtn.draw()
 
-    def render(self):
-        #Background
-        self.window.fill((0, 0, 0))
-        self.window.blit(self.winTexture, self.winTexture.get_rect(center = self.window.get_rect().center))
+        pg.display.flip()
 
-        #The rest of them
-        for unit in self.state.units:
-            self.renderUnit(unit)
-
-        pg.display.update()
-
-
-    #Loop
-    def run(self):
-        while self.running:
-            self.processInput()
-            self.update()
-            self.render()
-            self.clock.tick(60)
-
-game = Game()
-game.run()
-
-pg.quit()
-"""
+if __name__ == "__main__":
+    game = Game()
+    game.run()    
