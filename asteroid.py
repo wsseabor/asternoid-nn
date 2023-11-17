@@ -2,10 +2,10 @@ import pygame as pg
 from constants import *
 
 class Asteroid(pg.sprite.Sprite):
-    def __init__(self, settings, screen):
-        super(Asteroid, self).__init__()
-        self.screen = screen
-        self.settings = settings
+    def __init__(self, game):
+        super().__init__()
+        self.screen = game.screen
+        self.settings = game.settings
 
         self.image = pg.image.load(asteroidTexture)
         self.rect = self.image.get_rect()

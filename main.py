@@ -26,6 +26,8 @@ class Game:
 
         self.stats = Stats(self)
 
+        self.gameActive = False
+
         self.player = Player(self)
         self.asteroids = pg.sprite.Group()
 
@@ -53,7 +55,7 @@ class Game:
 
             pg.mouse.set_visible(False)
                 
-    def _checkDownEvents(self):
+    def _checkDownEvents(self, event):
         for event in pg.event.get():
             if event.key == pg.K_RIGHT:
                     self.player.moveRight = True

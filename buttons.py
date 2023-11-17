@@ -2,9 +2,9 @@ import pygame as pg
 import pygame.font
 
 class Button:
-    def __init__(self, settings, screen, message):
-        self.screen = screen
-        self.screenRect = screen.get_rect()
+    def __init__(self, game, message):
+        self.screen = game.screen
+        self.screenRect = self.screen.get_rect()
 
         self.width, self.height = 200, 50
         self.btnColor = (0, 255, 0)

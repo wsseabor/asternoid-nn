@@ -5,11 +5,12 @@ from constants import *
 from player import Player
 
 class Scoreboard:
-    def __init__(self, settings, screen, stats):
-        self.screen = screen
-        self.screenRect = screen.get_rect()
-        self.settings = settings
-        self.stats = stats
+    def __init__(self, game):
+        self.game = game
+        self.screen = game.screen
+        self.screenRect = self.screen.get_rect()
+        self.settings = game.settings
+        self.stats = game.stats
 
         self.textColor = (TEXT_COLOR)
         self.font = pg.font.SysFont(None, 48)
